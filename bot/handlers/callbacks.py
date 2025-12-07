@@ -8,6 +8,7 @@ from bot.keyboards import (
     get_threshold_keyboard,
     get_time_keyboard,
 )
+from bot.services.iqair import iqair_service
 from bot.states import SetupStates
 
 router = Router()
@@ -182,6 +183,14 @@ async def save_settings_and_finish(callback: CallbackQuery, state: FSMContext) -
     """Save user settings to database and show confirmation"""
     data = await state.get_data()
 
+    # Get current AQI level to initialize last_aqi_level
+    # This prevents false alerts on first scheduler check
+    current_level = None
+    if data.get("alert_enabled", True):
+        air_data = await iqair_service.get_air_quality()
+        if air_data:
+            current_level = air_data.level
+
     async with async_session() as session:
         repo = UserRepository(session)
         user = await repo.get_or_create(callback.from_user.id)
@@ -192,6 +201,7 @@ async def save_settings_and_finish(callback: CallbackQuery, state: FSMContext) -
             daily_minute=data.get("daily_minute", 0),
             alert_enabled=data.get("alert_enabled", True),
             alert_threshold=data.get("alert_threshold", 101),
+            last_aqi_level=current_level,
         )
 
     # Build confirmation message
