@@ -1,0 +1,19 @@
+# Telegram Bot
+aiogram==3.22.0
+
+# Database
+SQLAlchemy[asyncio]==2.0.44
+asyncpg==0.31.0
+alembic==1.14.1
+
+# Configuration
+pydantic-settings==2.12.0
+
+# Scheduler
+APScheduler==3.11.1
+
+# HTTP Client (already included in aiogram, but explicit)
+aiohttp==3.11.18
+
+# Timezone support
+pytz==2024.2
